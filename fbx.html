@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>My first three.js app</title>
+    <style>
+        body { margin: 0; }
+    </style>
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@v0.129.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@v0.129.0/examples/jsm/"
+        }
+      }
+    </script>
+    
+</head>
+<body>
+    <div id="loding" style="position: fixed; left: 85px; font-size: 12px;"></div>
+
+  <canvas id="canvas" width="700" height="500"></canvas>
+
+  <!-- <script type="module" src="/js/fbx-loader.js"></script> -->
+  <script type="module">
+    import { LoadFbx } from '/js/load-fbx.js';
+
+    const url = '/resources/models/fbx/Martelo2.fbx';
+    // const url = '/resources/models/fbx/RESIDENCE.fbx';
+    new LoadFbx(url);
+  </script>
+
+</body>
+</html>
