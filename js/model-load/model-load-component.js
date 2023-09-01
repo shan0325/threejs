@@ -47,8 +47,7 @@ export class ModelLoadComponent {
 
     // 카메라
     setupCamera() {
-        
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set(0, 1, 7);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.scene.add(this.camera);
@@ -191,8 +190,14 @@ export class ModelLoadComponent {
 
         const box = new THREE.Box3().setFromObject(model);
         console.log(box);
+
+        const boxHelper = new THREE.Box3Helper( box, 0xffff00 );
+        this.scene.add(boxHelper);
+
+        const vector3Box = box.getSize(new THREE.Vector3());
+        console.log(vector3Box);
         
-        const sizeBox = box.getSize(new THREE.Vector3()).length();
+        const sizeBox = vector3Box.length();
         console.log(sizeBox);
 
         const centerBox = box.getCenter(new THREE.Vector3());
@@ -226,7 +231,7 @@ export class ModelLoadComponent {
 
         console.log(camera.position);
     }
-    
+
     setupLightPositionRatio(model) {
         const box = new THREE.Box3().setFromObject(model);
         const sizeBox = box.getSize(new THREE.Vector3()).length();
