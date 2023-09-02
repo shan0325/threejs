@@ -2,10 +2,10 @@ import * as THREE from "three";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 
 export default {
-  setupModelLoader(args) {
+  setupModelLoader(args, loadingManager) {
     return new Promise((resolve, reject) => {
       // fbx 로더
-      const fbxLoader = new FBXLoader();
+      const fbxLoader = new FBXLoader(loadingManager);
       fbxLoader.load(args.url, 
         (obj) => {
           console.log(obj);
@@ -28,12 +28,6 @@ export default {
           });
 
           resolve({model: obj, mixer});
-        }, function ( xhr ) {
-          const loaded = ( xhr.loaded / xhr.total * 100 ) + '% loaded';
-          document.querySelector('#loding').textContent = loaded;
-        }, function ( error ) {
-          console.log( error );
-          // console.log( 'An error happened' );
         }
       );
     });

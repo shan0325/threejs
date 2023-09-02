@@ -6,6 +6,31 @@
     <title>My first three.js app</title>
     <style>
         body { margin: 0; }
+
+        .progress-bar-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #progress-bar {
+            width: 30%;
+            margin-top: 0.5%;
+            height: 2%;
+        }
+
+        label {
+            color: white;
+            font-size: 2rem;
+        }
     </style>
 
     <!-- <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
@@ -22,15 +47,18 @@
     <script type="importmap">
     {
         "imports": {
-            "three": "https://unpkg.com/three@0.129.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.129.0/examples/jsm/"
+            "three": "https://unpkg.com/three@0.148.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.148.0/examples/jsm/"
         }
     }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
 </head>
 <body>
-  <div id="loding" style="position: fixed; left: 85px; font-size: 12px;"></div>
-
+    <div class="progress-bar-container">
+        <label for="progress-bar">Loading...</label>
+        <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
   <canvas id="canvas" width="700" height="500"></canvas>
 
   <script type="module">
@@ -50,6 +78,8 @@
         args = {
             loadType: loadType,
             url: '/resources/models/fbx/Martelo2.fbx'
+            // url: '/resources/models/fbx/Museum.fbx'
+            // url: '/resources/models/fbx/Ball Joint Doll Rigged Basemesh.fbx'
         }
     } else if(loadType == 'OBJ') {
         args = {
@@ -59,14 +89,14 @@
             // objUrl: '/resources/models/obj/male02/male02.obj',
 
             // 스케치팝 샘플
-            // mtlUrl: '/resources/models/obj/Sherb/obj.mtl',
-            // objUrl: '/resources/models/obj/Sherb/tinker.obj',
+            mtlUrl: '/resources/models/obj/Sherb/obj.mtl',
+            objUrl: '/resources/models/obj/Sherb/tinker.obj',
             // mtlUrl: '/resources/models/obj/bugatti/bugatti.mtl',
             // objUrl: '/resources/models/obj/bugatti/bugatti.obj',
 
             // upfac 샘플
-            mtlUrl: '/resources/models/obj/room_obj/Room1.mtl',
-            objUrl: '/resources/models/obj/room_obj/Room1.obj',
+            // mtlUrl: '/resources/models/obj/room_obj/Room1.mtl',
+            // objUrl: '/resources/models/obj/room_obj/Room1.obj',
             // mtlUrl: '/resources/models/obj/Museum/FileFormat/Museum.mtl',
             // objUrl: '/resources/models/obj/Museum/FileFormat/Museum.obj',
             // mtlUrl: '/resources/models/obj/Villa/FileFormat/Villa.mtl',

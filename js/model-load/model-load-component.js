@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import Stats from 'three/addons/libs/stats.module.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import modelGltfLoader from '/js/model-load/model-gltf-loader.js';
 import modelFbxLoader from '/js/model-load/model-fbx-loader.js';
 import modelObjLoader from '/js/model-load/model-obj-loader.js';
@@ -8,7 +10,6 @@ import modelObjLoader from '/js/model-load/model-obj-loader.js';
 
 export class ModelLoadComponent {
     constructor(args) {
-        this.animatePlaySpeed = 1;
         this.canvas = document.querySelector('#canvas');
         this.clock = new THREE.Clock();
         this.modelLoaders = {
@@ -16,6 +17,13 @@ export class ModelLoadComponent {
             'FBX': modelFbxLoader.setupModelLoader,
             'OBJ': modelObjLoader.setupModelLoader,
         }
+        this.guiOptions = {
+            wireframe: false,
+            speed: 1,
+            angle: 0.2,
+            penumbra: 0,
+            intensity: 1
+        };
 
         this.setupScene();
         this.setupCamera();
@@ -41,7 +49,7 @@ export class ModelLoadComponent {
 
         // 백그라운드 이미지 설정
         const textureLoader = new THREE.TextureLoader();
-        this.bgTexture = textureLoader.load('resources/textures/basic_background/Light-Blue-blur-background1.jpg');
+        this.bgTexture = textureLoader.load('resources/textures/basic_background/bg_blacknwhite.jpg');
         this.scene.background = this.bgTexture;
     }
 
@@ -63,10 +71,17 @@ export class ModelLoadComponent {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
         this.renderer.shadowMap.enabled = true; // 그림자 사용 시 설정
+
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1;
     }
 
     // 바닥 추가
     setupFloorMesh() {
+        // const grid = new THREE.GridHelper(1000, 1000);
+        // this.scene.add(grid);
+
         const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1);
         const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -77,7 +92,7 @@ export class ModelLoadComponent {
 
     // 빛(ambient)
     setupAmbientLight() {
-        const aLight = new THREE.AmbientLight(0xffffff, 1.2);
+        const aLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(aLight);
         this.camera.add(aLight);
     }
@@ -125,9 +140,41 @@ export class ModelLoadComponent {
         document.body.appendChild(this.stats.dom);
     }
 
+    // rgbe 로드
+    async setupRgbe(scene) {
+        return new Promise((resolve, reject) => {
+            const rgbeLoader = new RGBELoader();
+            rgbeLoader.load('/resources/hdr/MR_INT-005_WhiteNeons_NAD.hdr', function(texture) {
+                console.log(texture);
+
+                texture.mapping = THREE.EquirectangularReflectionMapping;
+                scene.environment = texture;        
+                resolve(texture);
+            });
+        });
+    }
+
     // 모델 로드
     async setupModel(args) {
-        const result = await this.modelLoaders[args.loadType](args);
+        // await this.setupRgbe(this.scene);
+
+        const loadingManager = new THREE.LoadingManager();
+        // loadingManager.onStart = function(url, item, total) {
+        //     console.log(`Started loading: ${url}`);
+        // }
+        const progressBar = document.querySelector('#progress-bar');
+        loadingManager.onProgress = function(url, loaded, total) {
+            progressBar.value = (loaded / total) * 100;
+        }
+        const progressBarContainer = document.querySelector('.progress-bar-container');
+        loadingManager.onLoad = function() {
+            progressBarContainer.style.display = 'none';
+        }
+        loadingManager.onError = function(url) {
+            console.error(`Got a problem loading: ${url}`);
+        }
+
+        const result = await this.modelLoaders[args.loadType](args, loadingManager);
         if(result) {
             this.scene.add(result.model);
             this.model = result.model;
@@ -135,9 +182,11 @@ export class ModelLoadComponent {
 
             this.setCameraPositionRatio(this.model, this.camera, this.controls, 'Z', true);
             this.setupLightPositionRatio(this.model);
+            this.setupGui(this.model, this.camera);
         }
     }
 
+    // 윈도우 사이즈 변경
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight
         this.camera.updateProjectionMatrix()
@@ -148,18 +197,10 @@ export class ModelLoadComponent {
         this.render()
     }
 
+    // FPS 프레임 처리
     animate() {
         if(this.mixer) {
-            this.mixer.update(this.clock.getDelta() * this.animatePlaySpeed);
-        }
-
-        if(this.model) {
-            // this.model.children[1].rotation.y += 0.1;
-            // this.model.children[6].rotation.y += 0.1;
-            // this.model.children[7].rotation.y += 0.1;
-            // this.model.children[8].rotation.y += 0.1;
-            // this.model.children[5].rotation.y += 0.1;
-            // this.model.children[9].rotation.y += 0.1;
+            this.mixer.update(this.clock.getDelta() * this.guiOptions.speed);
         }
     
         this.controls.update();
@@ -169,10 +210,12 @@ export class ModelLoadComponent {
         requestAnimationFrame(this.animate.bind(this));
     }
 
+    // 렌더링 처리
     render() {
         this.renderer.render(this.scene, this.camera);
     }
 
+    // 백그라운드 texture 이미지 설정 시 비율 설정
     setBgTextureSizeRatio(canvas, bgTexture) {
         const canvasAspect = canvas.clientWidth / canvas.clientHeight;
         const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
@@ -185,12 +228,11 @@ export class ModelLoadComponent {
         bgTexture.repeat.y = aspect > 1 ? 1 : aspect;
     }
 
+    // 모델별 카메라 비율 설정
     setCameraPositionRatio(model, camera, controls, viewMode, bFront) {
         const zPositionRatio = 2;
 
         const box = new THREE.Box3().setFromObject(model);
-        console.log(box);
-
         const boxHelper = new THREE.Box3Helper( box, 0xffff00 );
         this.scene.add(boxHelper);
 
@@ -198,10 +240,7 @@ export class ModelLoadComponent {
         console.log(vector3Box);
         
         const sizeBox = vector3Box.length();
-        console.log(sizeBox);
-
         const centerBox = box.getCenter(new THREE.Vector3());
-        console.log(centerBox);
 
         let offsetX = 0, offsetY = 0, offsetZ = 0;
         viewMode === "X" ? offsetX = 1 : (viewMode === "Y") ? offsetY = 1 : offsetZ = 1;
@@ -228,19 +267,46 @@ export class ModelLoadComponent {
         controls.maxDistance = sizeBox * 10;
         controls.target.copy(centerBox);
         controls.update();
-
-        console.log(camera.position);
     }
 
+    // 모델별 빛 비율 조정
     setupLightPositionRatio(model) {
         const box = new THREE.Box3().setFromObject(model);
         const sizeBox = box.getSize(new THREE.Vector3()).length();
         const centerBox = box.getCenter(new THREE.Vector3());
 
-        // this.setupDirectionalLight(box.min.x * 2, sizeBox + box.max.y, box.max.z * 2, 1);
+        this.setupDirectionalLight(box.min.x * 2, sizeBox + box.max.y, box.max.z * 2, 1);
         // this.setupDirectionalLight(box.max.x * 2, sizeBox * -1, box.max.z * 2, 1);
         // this.setupPointLight(centerBox.x, centerBox.y, box.max.z * 7, 20, sizeBox);
         // this.setupPointLight(0, sizeBox, 0, 10, sizeBox);
         // this.setupPointLight(0, sizeBox * -0.5, 0, 10, sizeBox);
+    }
+
+    // GUI 컨트롤 설정
+    setupGui(model, camera) {
+        const gui = new GUI()
+
+        gui.add(this.guiOptions, 'wireframe').onChange(function(e){
+            model.traverse( function ( object ) {
+                if ( object.isMesh ) {
+                    object.material.wireframe = e;
+                }
+            } );
+        });
+
+        // gui.add(this.guiOptions, 'angle', 0, 1);
+        // gui.add(this.guiOptions, 'penumbra', 0, 1);
+        // gui.add(this.guiOptions, 'intensity', 0, 1);
+
+        const modelFolder = gui.addFolder('Model')
+        modelFolder.add(model.rotation, 'x', 0, Math.PI * 2)
+        modelFolder.add(model.rotation, 'y', 0, Math.PI * 2)
+        modelFolder.add(model.rotation, 'z', 0, Math.PI * 2)
+        modelFolder.add(this.guiOptions, 'speed', 0, 5)
+        modelFolder.open()
+        
+        const cameraFolder = gui.addFolder('Camera')
+        cameraFolder.add(camera.position, 'z', 0, camera.position.z * 2)
+        cameraFolder.open()
     }
 }

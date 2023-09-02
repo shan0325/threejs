@@ -2,9 +2,9 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export default {
-    setupModelLoader(args) {
+    setupModelLoader(args, loadingManager) {
         return new Promise((resolve, reject) => {
-            const loader = new GLTFLoader();
+            const loader = new GLTFLoader(loadingManager);
             loader.load(args.url,
                 (gltf) => {
                     console.log(gltf);
@@ -26,13 +26,6 @@ export default {
                     }
 
                     resolve({model, mixer});
-                },
-                function ( xhr ) {
-                    const loaded = ( xhr.loaded / xhr.total * 100 ) + '% loaded';
-                    document.querySelector('#loding').textContent = loaded;
-                },
-                function ( error ) {
-                    console.log( 'An error happened' );
                 }
             );
         });

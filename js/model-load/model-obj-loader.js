@@ -3,7 +3,7 @@ import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
 
 export default {
-    async setupModelLoader(args) {
+    async setupModelLoader(args, loadingManager) {
         const mtlUrl = args.mtlUrl;
         const objUrl = args.objUrl;
 
@@ -11,7 +11,7 @@ export default {
         if(mtlUrl) {
             const mtlLoaderPromise = new Promise((resolve, reject) => {
                 // mtl 로더
-                const mtlLoader = new MTLLoader();
+                const mtlLoader = new MTLLoader(loadingManager);
                 mtlLoader.load(mtlUrl, 
                     (mtl) => {
                         console.log(mtl);
@@ -31,7 +31,7 @@ export default {
 
         return new Promise((resolve, reject) => {
             // obj 로더
-            const objLoader = new OBJLoader();
+            const objLoader = new OBJLoader(loadingManager);
             if(mtl) {
                 objLoader.setMaterials(mtl); // MTLLoader에서 로드한 materials 파일을 설정합니다.
             }
@@ -60,12 +60,6 @@ export default {
                     });
 
                     resolve({model: obj, mixer});
-                }, function ( xhr ) {
-                    const loaded = ( xhr.loaded / xhr.total * 100 ) + '% loaded';
-                    document.querySelector('#loding').textContent = loaded;
-                }, function ( error ) {
-                    console.log( 'An error happened' );
-                    reject(error)
                 }
             );
         });
