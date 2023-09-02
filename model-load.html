@@ -52,65 +52,64 @@
         }
     }
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
 </head>
 <body>
     <div class="progress-bar-container">
         <label for="progress-bar">Loading...</label>
         <progress id="progress-bar" value="0" max="100"></progress>
     </div>
-  <canvas id="canvas" width="700" height="500"></canvas>
+    <canvas id="canvas" width="700" height="500"></canvas>
 
-  <script type="module">
-    import { ModelLoadComponent } from '/js/model-load/model-load-component.js';
+    <script type="module">
+        import { ModelLoadComponent } from '/js/model-load/model-load-component.js';
 
-    const loadType = getParameter("loadType");
-    let args;
+        const loadType = getParameter("loadType");
+        let args;
 
-    if(loadType == 'GLTF') {
-        args = {
-            loadType: loadType,
-            url: '/resources/models/gltf/camel/scene.gltf'
-            // url: '/resources/models/gltf/shiba/scene.gltf'
-            // url: '/resources/models/gltf/cute_ghost/scene.gltf'
+        if(loadType == 'GLTF') {
+            args = {
+                loadType: loadType,
+                url: '/resources/models/gltf/camel/scene.gltf'
+                // url: '/resources/models/gltf/shiba/scene.gltf'
+                // url: '/resources/models/gltf/cute_ghost/scene.gltf'
+            }
+        } else if(loadType == 'FBX') {
+            args = {
+                loadType: loadType,
+                url: '/resources/models/fbx/Martelo2.fbx'
+                // url: '/resources/models/fbx/Museum.fbx'
+                // url: '/resources/models/fbx/Ball Joint Doll Rigged Basemesh.fbx'
+            }
+        } else if(loadType == 'OBJ') {
+            args = {
+                loadType: loadType,
+                // three js 샘플
+                // mtlUrl: '/resources/models/obj/male02/male02.mtl',
+                // objUrl: '/resources/models/obj/male02/male02.obj',
+
+                // 스케치팝 샘플
+                // mtlUrl: '/resources/models/obj/Sherb/obj.mtl',
+                // objUrl: '/resources/models/obj/Sherb/tinker.obj',
+                // mtlUrl: '/resources/models/obj/bugatti/bugatti.mtl',
+                // objUrl: '/resources/models/obj/bugatti/bugatti.obj',
+
+                // upfac 샘플
+                // mtlUrl: '/resources/models/obj/room_obj/Room1.mtl',
+                // objUrl: '/resources/models/obj/room_obj/Room1.obj',
+                mtlUrl: '/resources/models/obj/Museum/FileFormat/Museum.mtl',
+                objUrl: '/resources/models/obj/Museum/FileFormat/Museum.obj',
+                // mtlUrl: '/resources/models/obj/Villa/FileFormat/Villa.mtl',
+                // objUrl: '/resources/models/obj/Villa/FileFormat/Villa.obj',
+            }
         }
-    } else if(loadType == 'FBX') {
-        args = {
-            loadType: loadType,
-            url: '/resources/models/fbx/Martelo2.fbx'
-            // url: '/resources/models/fbx/Museum.fbx'
-            // url: '/resources/models/fbx/Ball Joint Doll Rigged Basemesh.fbx'
+        new ModelLoadComponent(args);
+
+        function getParameter(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
-    } else if(loadType == 'OBJ') {
-        args = {
-            loadType: loadType,
-            // three js 샘플
-            // mtlUrl: '/resources/models/obj/male02/male02.mtl',
-            // objUrl: '/resources/models/obj/male02/male02.obj',
-
-            // 스케치팝 샘플
-            mtlUrl: '/resources/models/obj/Sherb/obj.mtl',
-            objUrl: '/resources/models/obj/Sherb/tinker.obj',
-            // mtlUrl: '/resources/models/obj/bugatti/bugatti.mtl',
-            // objUrl: '/resources/models/obj/bugatti/bugatti.obj',
-
-            // upfac 샘플
-            // mtlUrl: '/resources/models/obj/room_obj/Room1.mtl',
-            // objUrl: '/resources/models/obj/room_obj/Room1.obj',
-            // mtlUrl: '/resources/models/obj/Museum/FileFormat/Museum.mtl',
-            // objUrl: '/resources/models/obj/Museum/FileFormat/Museum.obj',
-            // mtlUrl: '/resources/models/obj/Villa/FileFormat/Villa.mtl',
-            // objUrl: '/resources/models/obj/Villa/FileFormat/Villa.obj',
-        }
-    }
-    new ModelLoadComponent(args);
-
-    function getParameter(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    }
-  </script>
+    </script>
 </body>
 </html>

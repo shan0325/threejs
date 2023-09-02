@@ -69,12 +69,12 @@ export class ModelLoadComponent {
             logarithmicDepthBuffer: true,
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
-        this.renderer.shadowMap.enabled = true; // 그림자 사용 시 설정
-
         this.renderer.outputEncoding = THREE.sRGBEncoding;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1;
+        this.renderer.shadowMap.enabled = true; // 그림자 사용 시 설정
+
+        document.body.appendChild(this.renderer.domElement);
     }
 
     // 바닥 추가
@@ -144,11 +144,12 @@ export class ModelLoadComponent {
     async setupRgbe(scene) {
         return new Promise((resolve, reject) => {
             const rgbeLoader = new RGBELoader();
-            rgbeLoader.load('/resources/hdr/MR_INT-005_WhiteNeons_NAD.hdr', function(texture) {
+            rgbeLoader.load('/resources/hdr/kloofendal_43d_clear_puresky_4k.hdr', function(texture) {
                 console.log(texture);
 
                 texture.mapping = THREE.EquirectangularReflectionMapping;
-                scene.environment = texture;        
+                scene.background = texture; // 3차원 배경으로 사용
+                scene.environment = texture; // 광원으로 사용
                 resolve(texture);
             });
         });
@@ -156,7 +157,7 @@ export class ModelLoadComponent {
 
     // 모델 로드
     async setupModel(args) {
-        // await this.setupRgbe(this.scene);
+        await this.setupRgbe(this.scene);
 
         const loadingManager = new THREE.LoadingManager();
         // loadingManager.onStart = function(url, item, total) {
@@ -275,7 +276,7 @@ export class ModelLoadComponent {
         const sizeBox = box.getSize(new THREE.Vector3()).length();
         const centerBox = box.getCenter(new THREE.Vector3());
 
-        this.setupDirectionalLight(box.min.x * 2, sizeBox + box.max.y, box.max.z * 2, 1);
+        // this.setupDirectionalLight(box.min.x * 2, sizeBox + box.max.y, box.max.z * 2, 1);
         // this.setupDirectionalLight(box.max.x * 2, sizeBox * -1, box.max.z * 2, 1);
         // this.setupPointLight(centerBox.x, centerBox.y, box.max.z * 7, 20, sizeBox);
         // this.setupPointLight(0, sizeBox, 0, 10, sizeBox);

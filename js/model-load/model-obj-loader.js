@@ -45,7 +45,6 @@ export default {
                         if ( child.isMesh ) {
                             child.castShadow = true;
                             const material = child.material;
-                            // material.map = texture;
                             if(material.isMeshPhongMaterial) {
                                 // material.shininess = 50;
                             }
