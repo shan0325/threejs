@@ -70,8 +70,8 @@
       <canvas id="canvas"></canvas>
     </div>
 
-    <!-- <button id="captureBtn">이미지 추출</button> -->
-    <!-- <div id="captureArea"></div> -->
+    <button id="captureBtn">이미지 추출</button>
+    <div id="captureArea"></div>
 
     <script type="module">
       import { ModelLoadComponent } from "/js/model-load/model-load-component.js";
@@ -82,37 +82,38 @@
       if (loadType == "GLTF") {
         args = {
           loadType: loadType,
-          url: "/resources/models/gltf/camel/scene.gltf",
-          // url: '/resources/models/gltf/shiba/scene.gltf'
+          // url: "/resources/models/gltf/camel/scene.gltf",
+          url: '/resources/models/gltf/shiba/scene.gltf'
           // url: '/resources/models/gltf/cute_ghost/scene.gltf'
         };
       } else if (loadType == "FBX") {
         args = {
           loadType: loadType,
-          url: "/resources/models/fbx/Martelo2.fbx",
+          // url: "/resources/models/fbx/ConventionCenter/ConventionCenter_01.fbx",
+          // url: "/resources/models/fbx/Martelo2.fbx",
           // url: '/resources/models/fbx/Museum.fbx'
-          // url: '/resources/models/fbx/Ball Joint Doll Rigged Basemesh.fbx'
+          url: '/resources/models/fbx/Ball Joint Doll Rigged Basemesh.fbx'
         };
       } else if (loadType == "OBJ") {
         args = {
           loadType: loadType,
           // three js 샘플
-          // mtlUrl: '/resources/models/obj/male02/male02.mtl',
-          // objUrl: '/resources/models/obj/male02/male02.obj',
+          // mtlUrl: "/resources/models/obj/male02/male02.mtl",
+          // objUrl: "/resources/models/obj/male02/male02.obj",
 
           // 스케치팝 샘플
-          // mtlUrl: '/resources/models/obj/Sherb/obj.mtl',
-          // objUrl: '/resources/models/obj/Sherb/tinker.obj',
-          // mtlUrl: '/resources/models/obj/bugatti/bugatti.mtl',
-          // objUrl: '/resources/models/obj/bugatti/bugatti.obj',
+          // mtlUrl: "/resources/models/obj/Sherb/obj.mtl",
+          // objUrl: "/resources/models/obj/Sherb/tinker.obj",
+          // mtlUrl: "/resources/models/obj/bugatti/bugatti.mtl",
+          // objUrl: "/resources/models/obj/bugatti/bugatti.obj",
 
           // upfac 샘플
-          // mtlUrl: '/resources/models/obj/room_obj/Room1.mtl',
-          // objUrl: '/resources/models/obj/room_obj/Room1.obj',
+          // mtlUrl: "/resources/models/obj/room_obj/Room1.mtl",
+          // objUrl: "/resources/models/obj/room_obj/Room1.obj",
           mtlUrl: "/resources/models/obj/Museum/FileFormat/Museum.mtl",
           objUrl: "/resources/models/obj/Museum/FileFormat/Museum.obj",
-          // mtlUrl: '/resources/models/obj/Villa/FileFormat/Villa.mtl',
-          // objUrl: '/resources/models/obj/Villa/FileFormat/Villa.obj',
+          // mtlUrl: "/resources/models/obj/Villa/FileFormat/Villa.mtl",
+          // objUrl: "/resources/models/obj/Villa/FileFormat/Villa.obj",
         };
       }
       new ModelLoadComponent(args);

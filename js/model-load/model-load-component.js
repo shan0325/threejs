@@ -40,9 +40,8 @@ export class ModelLoadComponent {
 
     window.onresize = this.onWindowResize.bind(this);
     window.onmessage = this.onMessage.bind(this);
-
-    document.querySelector("#captureBtn").onclick =
-      this.onClickCapture.bind(this);
+    
+    document.querySelector("#captureBtn").onclick = this.onClickCapture.bind(this);
   }
 
   // 장면
@@ -79,9 +78,9 @@ export class ModelLoadComponent {
       logarithmicDepthBuffer: true,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1;
+    // this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.toneMapping = THREE.CineonToneMapping;
+    this.renderer.toneMappingExposure = 2;
     this.renderer.shadowMap.enabled = true; // 그림자 사용 시 설정
 
     // document.body.appendChild(this.renderer.domElement);
@@ -158,8 +157,6 @@ export class ModelLoadComponent {
       rgbeLoader.load(
         "/resources/hdr/kloofendal_43d_clear_puresky_4k.hdr",
         function (texture) {
-          console.log(texture);
-
           texture.mapping = THREE.EquirectangularReflectionMapping;
           scene.background = texture; // 3차원 배경으로 사용
           scene.environment = texture; // 광원으로 사용
@@ -197,13 +194,7 @@ export class ModelLoadComponent {
       this.model = result.model;
       this.mixer = result.mixer;
 
-      this.setCameraPositionRatio(
-        this.model,
-        this.camera,
-        this.controls,
-        "Z",
-        true
-      );
+      this.setCameraPositionRatio(this.model, this.camera, this.controls, "Z", true);
       this.setupLightPositionRatio(this.model);
       //   this.setupGui(this.model, this.camera);
     }
@@ -262,29 +253,19 @@ export class ModelLoadComponent {
     this.scene.add(boxHelper);
 
     const vector3Box = box.getSize(new THREE.Vector3());
-    console.log(vector3Box);
+    // console.log(vector3Box);
 
     const sizeBox = vector3Box.length();
     const centerBox = box.getCenter(new THREE.Vector3());
 
-    let offsetX = 0,
-      offsetY = 0,
-      offsetZ = 0;
-    viewMode === "X"
-      ? (offsetX = 1)
-      : viewMode === "Y"
-      ? (offsetY = 1)
-      : (offsetZ = 1);
+    let offsetX = 0, offsetY = 0, offsetZ = 0;
+    viewMode === "X" ? (offsetX = 1) : viewMode === "Y" ? (offsetY = 1) : (offsetZ = 1);
     if (!bFront) {
       offsetX *= -1;
       offsetY *= -1;
       offsetZ *= -1;
     }
-    camera.position.set(
-      centerBox.x + offsetX,
-      centerBox.y + offsetY,
-      centerBox.z + offsetZ
-    );
+    camera.position.set(centerBox.x + offsetX, centerBox.y + offsetY, centerBox.z + offsetZ);
 
     const halfSizeModel = sizeBox * 0.5;
     const halfFov = THREE.MathUtils.degToRad(camera.fov * 0.5);
